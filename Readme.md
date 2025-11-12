@@ -194,7 +194,6 @@ NODE_ENV=development
 # Database
 MONGO_URL=mongodb://localhost:27017/authentication
 
-# JWT Secrets
 ACCESS_TOKEN_SECRET=your-access-token-secret-key-here
 REFRESH_TOKEN_SECRET=your-refresh-token-secret-key-here
 ACCESS_TOKEN_EXPIRY=1h

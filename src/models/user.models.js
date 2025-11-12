@@ -122,9 +122,7 @@ userSchema.methods.generateTemporaryToken = function() {
 
     // IMPORTANT: Always hash tokens before storing in database
     // If database is compromised, hashed tokens can't be used directly
-    const hashedToken = crypto.createHash("sha256")
-        .update(unHashedToken)
-        .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(unHashedToken).digest("hex");
     
     // IMPORTANT: Set explicit expiry time (15 minutes for security-sensitive operations)
     // Prevents old tokens from being reused

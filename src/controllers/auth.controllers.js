@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/async-handler.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { User } from "../models/user.models.js";
+import sendEmail from "../utils/mail.js";
 import crypto from "crypto";
 
 // IMPORTANT: Always wrap async controller functions with asyncHandler
@@ -37,6 +38,10 @@ export const registerUser = asyncHandler(async (req, res) => {
         emailVerificationToken: hashedToken,
         emailVerificationExpiry: tokenExpiry
     });
+    const verificationUrl = `http://localhost:8000/api/v1/auth/verify/${unHashedToken}`;
+  // 5️⃣ Print the verification link in console
+    console.log("👇 Email Verification Link (copy and paste in browser):");
+    console.log(verificationUrl);
 
     // IMPORTANT: Remove sensitive data before sending response
     // Never send passwords, tokens, or internal IDs to clients
@@ -222,10 +227,24 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     user.forgotPasswordToken = hashedToken;
     user.forgotPasswordExpiry = tokenExpiry;
     await user.save({ validateBeforeSave: false });
+    const resetUrl = `http://localhost:8000/api/v1/auth/reset-password/${unHashedToken}`;
+
+   const htmlMessage = `
+    <h2>Password Reset Request</h2>
+    <p>You requested to reset your password. Click the link below to reset it:</p>
+    <a href="${resetUrl}" target="_blank">Reset Password</a>
+    <p>This link will expire in 10 minutes.</p>
+  `;
+
+  await sendEmail({
+    email: user.email,
+    subject: "Password Reset Request",
+    html: htmlMessage,
+  });
+
 
     // TODO: Send password reset email with unHashedToken
     // IMPORTANT: Include reset link with token in email
-
     return res.status(200).json(
         new ApiResponse(200, {}, "Password reset email sent successfully")
     );
